@@ -22,9 +22,11 @@ package com.lazycece.dlock.core.script;
  */
 public class LuaScript {
 
+    public static final Long SUCCESS = 1L;
+
     // 加锁Lua脚本
-    private static final String LOCK_SCRIPT =
-            "local lockKey = KEYS[1]\n" +
+    public static final String LOCK_SCRIPT =
+                    "local lockKey = KEYS[1]\n" +
                     "local threadInfo = ARGV[1]\n" +
                     "local expireTime = tonumber(ARGV[2])\n" +
                     "local currentValue = redis.call('get', lockKey)\n" +
@@ -45,8 +47,8 @@ public class LuaScript {
                     "end";
 
     // 解锁Lua脚本
-    private static final String UNLOCK_SCRIPT =
-            "local lockKey = KEYS[1]\n" +
+    public static final String UNLOCK_SCRIPT =
+                    "local lockKey = KEYS[1]\n" +
                     "local threadInfo = ARGV[1]\n" +
                     "local currentValue = redis.call('get', lockKey)\n" +
                     "if currentValue == false then\n" +
