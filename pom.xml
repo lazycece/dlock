@@ -74,6 +74,7 @@
 
         <!-- Opensource Package -->
         <spring.boot.version>3.1.5</spring.boot.version>
+        <fastjson2.version>2.0.57</fastjson2.version>
         <slf4j.version>2.0.5</slf4j.version>
     </properties>
 
@@ -85,6 +86,11 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
