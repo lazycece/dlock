@@ -16,6 +16,8 @@
 
 package com.lazycece.dlock.core;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -24,5 +26,26 @@ import java.util.concurrent.locks.Lock;
  */
 public interface DLock extends Lock {
 
+    void lock(long leaseTime, TimeUnit unit);
 
+    void lockInterruptibly(long leaseTime, TimeUnit unit) throws InterruptedException;
+
+    boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException;
+
+//    boolean forceUnlock();
+
+//    boolean isLocked();
+
+//    boolean isHeldByThread(long threadId);
+
+//    boolean isHeldByCurrentThread();
+
+//    int getHoldCount();
+
+//    long remainTimeToLive();
+
+    @Override
+    default Condition newCondition() {
+        throw new UnsupportedOperationException();
+    }
 }
