@@ -47,8 +47,6 @@ public interface DLock {
      */
     void unlock();
 
-//    boolean forceUnlock();
-
     /**
      * locked or not
      *
@@ -56,12 +54,11 @@ public interface DLock {
      */
     boolean isLocked();
 
-//    boolean isHeldByThread(long threadId);
-
-//    boolean isHeldByCurrentThread();
-
-//    int getHoldCount();
-
-//    long remainTimeToLive();
+    /**
+     * Number of holds on this lock by the current.
+     *
+     * @return result
+     */
+    int getHoldCount();
 
 }

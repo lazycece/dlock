@@ -17,7 +17,6 @@
 package com.lazycece.dlock.core.model;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import com.lazycece.dlock.core.DLock;
 import com.lazycece.dlock.core.config.DLockConfig;
 import com.lazycece.dlock.core.exception.DLockException;
@@ -29,8 +28,6 @@ import org.springframework.data.redis.core.TimeoutUtils;
 import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -90,14 +87,12 @@ public class RedisDistributedLock implements DLock {
         long start = System.currentTimeMillis();
 
         try {
-            Map<String, Object> threadInfo = new HashMap<>();
-            threadInfo.put("threadId", threadId);
-            threadInfo.put("count", 1);
-            String threadInfoJson = JSON.toJSONString(threadInfo);
+            LockedValue lockedValue = LockedValue.lockedValue(threadId, 1);
+            String lockedValueJson = JSON.toJSONString(lockedValue);
 
             while (true) {
                 Long result = redisTemplate.execute(lockScript, Collections.singletonList(lockKey)
-                        , Collections.singletonList(threadInfoJson), String.valueOf(expireMillisTime));
+                        , Collections.singletonList(lockedValueJson), String.valueOf(expireMillisTime));
 
                 if (LuaScript.SUCCESS.equals(result)) {
                     isLocked = true;
@@ -124,13 +119,11 @@ public class RedisDistributedLock implements DLock {
         }
 
         try {
-            Map<String, Object> threadInfo = new HashMap<>();
-            threadInfo.put("threadId", threadId);
-            threadInfo.put("count", 1);
-            String threadInfoJson = JSON.toJSONString(threadInfo);
+            LockedValue lockedValue = LockedValue.lockedValue(threadId, 1);
+            String lockedValueJson = JSON.toJSONString(lockedValue);
 
             Long result = redisTemplate.execute(unLockScript, Collections.singletonList(lockKey)
-                    , Collections.singletonList(threadInfoJson));
+                    , Collections.singletonList(lockedValueJson));
 
             if (LuaScript.SUCCESS.equals(result)) {
                 this.stopRenewal();
@@ -148,6 +141,21 @@ public class RedisDistributedLock implements DLock {
         return this.isLocked;
     }
 
+    @Override
+    public int getHoldCount() {
+        try {
+            String lockedValueJson = redisTemplate.opsForValue().get(lockKey);
+            LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
+            if (lockedValue == null) {
+                return 0;
+            } else {
+                return lockedValue.getCount() == null ? 0 : lockedValue.getCount();
+            }
+        } catch (Exception e) {
+            throw new DLockException("Get hold count fail.", e);
+        }
+    }
+
     /**
      * Start the lock renewals task.
      */
@@ -159,11 +167,10 @@ public class RedisDistributedLock implements DLock {
             }
 
             try {
-                String currentValue = redisTemplate.opsForValue().get(lockKey);
-                if (currentValue != null) {
-                    Map<String, Object> map = JSON.parseObject(currentValue, new TypeReference<Map<String, Object>>() {
-                    });
-                    if (threadId.equals(map.get("threadId"))) {
+                String lockedValueJson = redisTemplate.opsForValue().get(lockKey);
+                if (lockedValueJson != null) {
+                    LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
+                    if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
                         // current own, to renew
                         redisTemplate.expire(lockKey, leaseTime, unit);
                     } else {
