@@ -47,8 +47,8 @@
 
     <modules>
         <module>dlock-core</module>
-        <module>dlock-tests</module>
         <module>dlock-samples</module>
+        <module>dlock-spring-boot-starter</module>
     </modules>
 
     <properties>
