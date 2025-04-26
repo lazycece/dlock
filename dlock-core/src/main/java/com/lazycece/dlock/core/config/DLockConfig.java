@@ -22,6 +22,9 @@ package com.lazycece.dlock.core.config;
  */
 public class DLockConfig {
 
+    /**
+     * thread sleep time while trying lock.
+     */
     private long trySleepMillis = 100;
 
     /**
