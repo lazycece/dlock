@@ -79,24 +79,13 @@ public class RedisDistributedLock implements DLock {
     }
 
     @Override
-    public void lock() {
-        // TODO: 2025/4/21  lazycece
-    }
-
-    @Override
     public void lock(long leaseTime, TimeUnit unit) {
-        // TODO: 2025/4/21  lazycece
-    }
-
-    @Override
-    public boolean tryLock() {
-        // TODO: 2025/4/21  lazycece
-        return false;
+        this.tryLock(0, leaseTime, unit);
     }
 
     @Override
     public boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) {
-
+        long waitMillisTime = TimeoutUtils.toMillis(waitTime, unit);
         long expireMillisTime = TimeoutUtils.toMillis(leaseTime, unit);
         long start = System.currentTimeMillis();
 
@@ -116,7 +105,7 @@ public class RedisDistributedLock implements DLock {
                     return true;
                 }
 
-                if (System.currentTimeMillis() - start >= waitTime) {
+                if (System.currentTimeMillis() - start >= waitMillisTime) {
                     return false;
                 }
 
@@ -152,6 +141,11 @@ public class RedisDistributedLock implements DLock {
         } catch (Exception e) {
             throw new DLockException("unlock fail !", e);
         }
+    }
+
+    @Override
+    public boolean isLocked() {
+        return this.isLocked;
     }
 
     /**

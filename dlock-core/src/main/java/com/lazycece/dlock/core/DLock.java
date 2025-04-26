@@ -24,19 +24,37 @@ import java.util.concurrent.TimeUnit;
  */
 public interface DLock {
 
-    void lock();
-
+    /**
+     * lock
+     *
+     * @param leaseTime lease time.
+     * @param unit      time unit
+     */
     void lock(long leaseTime, TimeUnit unit);
 
-    boolean tryLock();
-
+    /**
+     * try lock
+     *
+     * @param waitTime  wait time while trying.
+     * @param leaseTime lease time
+     * @param unit      time unit
+     * @return lock result
+     */
     boolean tryLock(long waitTime, long leaseTime, TimeUnit unit);
 
+    /**
+     * Releases the lock.
+     */
     void unlock();
 
 //    boolean forceUnlock();
 
-//    boolean isLocked();
+    /**
+     * locked or not
+     *
+     * @return result
+     */
+    boolean isLocked();
 
 //    boolean isHeldByThread(long threadId);
 
