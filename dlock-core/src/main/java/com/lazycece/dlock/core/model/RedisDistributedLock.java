@@ -43,29 +43,39 @@ public class RedisDistributedLock implements DLock {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * lock config, given default information. Can custom using <code>{@code setLockConfig}</code>
+     *
+     * @see DLockConfig
+     * @see RedisDistributedLock#setLockConfig
+     */
     private DLockConfig dLockConfig = new DLockConfig();
+
     private volatile boolean isLocked = false;
 
     /* init parameter begin */
     private final StringRedisTemplate redisTemplate;
     private final String lockKey;
     private final String threadId;
-
     private final ScheduledExecutorService renewExecutor;
     private final RedisScript<Long> lockScript;
     private final RedisScript<Long> unLockScript;
     /* init parameter end */
-
-
+    
     public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String threadId) {
-
+        // variable
         this.redisTemplate = redisTemplate;
         this.lockKey = lockKey;
         this.threadId = threadId;
 
+        // default
         this.renewExecutor = Executors.newSingleThreadScheduledExecutor();
         this.lockScript = RedisScript.of(LuaScript.LOCK_SCRIPT, Long.class);
         this.unLockScript = RedisScript.of(LuaScript.UNLOCK_SCRIPT, Long.class);
+    }
+
+    public void setLockConfig(DLockConfig dLockConfig) {
+        this.dLockConfig = dLockConfig;
     }
 
     @Override
