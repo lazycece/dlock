@@ -24,7 +24,7 @@ public class LuaScript {
 
     public static final Long SUCCESS = 1L;
 
-    // 加锁Lua脚本
+    // lock lua script
     public static final String LOCK_SCRIPT =
                     "local lockKey = KEYS[1]\n" +
                     "local threadInfo = ARGV[1]\n" +
@@ -46,7 +46,7 @@ public class LuaScript {
                     "    return 0\n" +
                     "end";
 
-    // 解锁Lua脚本
+    // unlock lua script
     public static final String UNLOCK_SCRIPT =
                     "local lockKey = KEYS[1]\n" +
                     "local threadInfo = ARGV[1]\n" +
