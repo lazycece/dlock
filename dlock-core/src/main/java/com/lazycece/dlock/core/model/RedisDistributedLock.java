@@ -61,7 +61,7 @@ public class RedisDistributedLock implements DLock {
     private final RedisScript<Long> lockScript;
     private final RedisScript<Long> unLockScript;
     /* init parameter end */
-    
+
     public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String threadId) {
         // variable
         this.redisTemplate = redisTemplate;
@@ -120,7 +120,7 @@ public class RedisDistributedLock implements DLock {
                     return false;
                 }
 
-                // 避免CPU空转
+                // sleepy
                 Thread.sleep(dLockConfig.getTrySleepMillis());
             }
         } catch (Exception e) {
@@ -159,31 +159,31 @@ public class RedisDistributedLock implements DLock {
      */
     private void startRenewal(long leaseTime, TimeUnit unit) {
         renewExecutor.scheduleAtFixedRate(() -> {
+            // no locks, no renewal required.
             if (!isLocked) {
                 return;
             }
 
             try {
-                // 检查锁是否仍被当前线程持有
                 String currentValue = redisTemplate.opsForValue().get(lockKey);
                 if (currentValue != null) {
                     Map<String, Object> map = JSON.parseObject(currentValue, new TypeReference<Map<String, Object>>() {
                     });
                     if (threadId.equals(map.get("threadId"))) {
-                        // 续期
+                        // current own, to renew
                         redisTemplate.expire(lockKey, leaseTime, unit);
                     } else {
-                        // 锁已被其他线程获取，停止续期
+                        // lost lock, to stop renew
                         stopRenewal();
                         isLocked = false;
                     }
                 } else {
-                    // 锁已过期，停止续期
+                    // lost lock, to stop renew
                     stopRenewal();
                     isLocked = false;
                 }
             } catch (Exception e) {
-                // 续期失败，记录日志
+                // renewal failed, print log.
                 log.error("lock renewals fail: {}", e.getMessage(), e);
             }
         }, dLockConfig.getRenewalPeriod() / 3, dLockConfig.getRenewalPeriod() / 3, TimeUnit.MILLISECONDS);
