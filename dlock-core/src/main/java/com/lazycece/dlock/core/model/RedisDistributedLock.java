@@ -168,16 +168,10 @@ public class RedisDistributedLock implements DLock {
 
             try {
                 String lockedValueJson = redisTemplate.opsForValue().get(lockKey);
-                if (lockedValueJson != null) {
-                    LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
-                    if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
-                        // current own, to renew
-                        redisTemplate.expire(lockKey, leaseTime, unit);
-                    } else {
-                        // lost lock, to stop renew
-                        stopRenewal();
-                        isLocked = false;
-                    }
+                LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
+                if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
+                    // current own, to renew
+                    redisTemplate.expire(lockKey, leaseTime, unit);
                 } else {
                     // lost lock, to stop renew
                     stopRenewal();
