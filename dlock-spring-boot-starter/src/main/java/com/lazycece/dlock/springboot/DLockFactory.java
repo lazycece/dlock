@@ -67,10 +67,11 @@ public class DLockFactory {
     }
 
     private DLockConfig getLockConfig() {
-        DLockConfig lockConfig = new DLockConfig();
-        lockConfig.setTrySleepMillis(lockProperties.getTrySleepMillis());
-        lockConfig.setEnableRenewal(lockConfig.isEnableRenewal());
-        lockConfig.setRenewalPeriod(lockConfig.getRenewalPeriod());
-        return lockConfig;
+        DLockConfig config = new DLockConfig();
+        config.setDefaultTimeoutWaitTime(lockProperties.getDefaultTimeoutWaitTime());
+        config.setTrySleepMillis(lockProperties.getTrySleepMillis());
+        config.setEnableRenewal(lockProperties.isEnableRenewal());
+        config.setRenewalPeriod(lockProperties.getRenewalPeriod());
+        return config;
     }
 }

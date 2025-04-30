@@ -16,11 +16,51 @@
 
 package com.lazycece.dlock.springboot;
 
+import com.lazycece.dlock.core.DLock;
+import com.lazycece.dlock.core.exception.DLockTimeoutException;
+import com.lazycece.dlock.springboot.function.Handler;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author lazycece
  * @date 2025/4/30
  */
 public class DLockUtils {
 
+    /**
+     * try lock handle
+     *
+     * @param lockKey   lock key
+     * @param leaseTime lease time
+     * @param unit      time unit
+     * @param handler   handler
+     */
+    public static void tryLock(String lockKey, long leaseTime, TimeUnit unit, Handler handler) {
+        DLock lock = DLockFactory.getInstance().produce(lockKey);
+        if (lock.tryLock(leaseTime, unit)) {
+            handler.handle();
+        } else {
+            throw new DLockTimeoutException("try lock timeout!");
+        }
+    }
+
+    /**
+     * try lock handle
+     *
+     * @param lockKey   lock key
+     * @param waitTime  wait time while trying.
+     * @param leaseTime lease time
+     * @param unit      time unit
+     * @param handler   handler
+     */
+    public static void tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Handler handler) {
+        DLock lock = DLockFactory.getInstance().produce(lockKey);
+        if (lock.tryLock(waitTime, leaseTime, unit)) {
+            handler.handle();
+        } else {
+            throw new DLockTimeoutException("try lock timeout!");
+        }
+    }
 
 }

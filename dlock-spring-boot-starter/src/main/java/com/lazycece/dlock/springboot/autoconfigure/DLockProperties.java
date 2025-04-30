@@ -28,6 +28,11 @@ import java.util.UUID;
 public class DLockProperties {
 
     /**
+     * The default timeout waiting time while trying lock, default value is  50 milliseconds.
+     */
+    private long defaultTimeoutWaitTime = 50;
+
+    /**
      * thread sleep time while trying lock.
      */
     private long trySleepMillis = 100;
@@ -51,7 +56,14 @@ public class DLockProperties {
      * The machine instance id, default is uuid; you should use the real instance id.
      */
     private String machineInstanceId = UUID.randomUUID().toString();
-    ;
+
+    public long getDefaultTimeoutWaitTime() {
+        return defaultTimeoutWaitTime;
+    }
+
+    public void setDefaultTimeoutWaitTime(long defaultTimeoutWaitTime) {
+        this.defaultTimeoutWaitTime = defaultTimeoutWaitTime;
+    }
 
     public long getTrySleepMillis() {
         return trySleepMillis;
