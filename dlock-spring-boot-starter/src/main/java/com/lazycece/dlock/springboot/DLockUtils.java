@@ -18,7 +18,10 @@ package com.lazycece.dlock.springboot;
 
 import com.lazycece.dlock.core.DLock;
 import com.lazycece.dlock.core.exception.DLockTimeoutException;
+import com.lazycece.dlock.springboot.function.Answer;
 import com.lazycece.dlock.springboot.function.Handler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,36 +31,71 @@ import java.util.concurrent.TimeUnit;
  */
 public class DLockUtils {
 
-    /**
-     * try lock handle
-     *
-     * @param lockKey   lock key
-     * @param leaseTime lease time
-     * @param unit      time unit
-     * @param handler   handler
-     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DLockUtils.class);
+
     public static void tryLock(String lockKey, long leaseTime, TimeUnit unit, Handler handler) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
         if (lock.tryLock(leaseTime, unit)) {
-            handler.handle();
+            try {
+                handler.handle();
+            } finally {
+                try {
+                    lock.unlock();
+                } catch (Exception ine) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                }
+            }
         } else {
             throw new DLockTimeoutException("try lock timeout!");
         }
     }
 
-    /**
-     * try lock handle
-     *
-     * @param lockKey   lock key
-     * @param waitTime  wait time while trying.
-     * @param leaseTime lease time
-     * @param unit      time unit
-     * @param handler   handler
-     */
     public static void tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Handler handler) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
         if (lock.tryLock(waitTime, leaseTime, unit)) {
-            handler.handle();
+            try {
+                handler.handle();
+            } finally {
+                try {
+                    lock.unlock();
+                } catch (Exception ine) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                }
+            }
+        } else {
+            throw new DLockTimeoutException("try lock timeout!");
+        }
+    }
+
+    public static <T> T tryLock(String lockKey, long leaseTime, TimeUnit unit, Answer<T> answer) {
+        DLock lock = DLockFactory.getInstance().produce(lockKey);
+        if (lock.tryLock(leaseTime, unit)) {
+            try {
+                return answer.reply();
+            } finally {
+                try {
+                    lock.unlock();
+                } catch (Exception ine) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                }
+            }
+        } else {
+            throw new DLockTimeoutException("try lock timeout!");
+        }
+    }
+
+    public static <T> T tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Answer<T> answer) {
+        DLock lock = DLockFactory.getInstance().produce(lockKey);
+        if (lock.tryLock(waitTime, leaseTime, unit)) {
+            try {
+                return answer.reply();
+            } finally {
+                try {
+                    lock.unlock();
+                } catch (Exception ine) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                }
+            }
         } else {
             throw new DLockTimeoutException("try lock timeout!");
         }
