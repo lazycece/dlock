@@ -23,6 +23,11 @@ package com.lazycece.dlock.core.config;
 public class DLockConfig {
 
     /**
+     * The default timeout waiting time while trying lock, default value is  50 milliseconds.
+     */
+    private long defaultTimeoutWaitTime = 50;
+
+    /**
      * thread sleep time while trying lock.
      */
     private long trySleepMillis = 100;
@@ -37,6 +42,13 @@ public class DLockConfig {
      */
     private long renewalPeriod = 3 * 1000;
 
+    public long getDefaultTimeoutWaitTime() {
+        return defaultTimeoutWaitTime;
+    }
+
+    public void setDefaultTimeoutWaitTime(long defaultTimeoutWaitTime) {
+        this.defaultTimeoutWaitTime = defaultTimeoutWaitTime;
+    }
 
     public long getTrySleepMillis() {
         return trySleepMillis;

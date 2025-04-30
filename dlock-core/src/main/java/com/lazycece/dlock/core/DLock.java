@@ -30,7 +30,7 @@ public interface DLock {
      * @param leaseTime lease time.
      * @param unit      time unit
      */
-    void lock(long leaseTime, TimeUnit unit);
+    boolean tryLock(long leaseTime, TimeUnit unit);
 
     /**
      * try lock
