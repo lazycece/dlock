@@ -28,9 +28,9 @@ public class DLockConfig {
     private long trySleepMillis = 100;
 
     /**
-     * The renewal period, default 10 * 1000 milliseconds.
+     * The renewal period, default 3 * 1000 milliseconds.
      */
-    private long renewalPeriod = 10 * 1000;
+    private long renewalPeriod = 3 * 1000;
 
 
     public long getTrySleepMillis() {
