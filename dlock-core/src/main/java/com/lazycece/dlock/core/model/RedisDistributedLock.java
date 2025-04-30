@@ -51,7 +51,7 @@ public class RedisDistributedLock implements DLock {
      * @see DLockConfig
      * @see RedisDistributedLock#setLockConfig
      */
-    private DLockConfig dLockConfig = new DLockConfig();
+    private DLockConfig lockConfig = new DLockConfig();
 
     private volatile boolean isLocked = false;
 
@@ -59,7 +59,7 @@ public class RedisDistributedLock implements DLock {
     private final StringRedisTemplate redisTemplate;
     private final String lockKey;
     private final String threadId;
-    private final ScheduledExecutorService renewExecutor;
+    private ScheduledExecutorService renewExecutor;
     /* init parameter end */
 
     public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String threadId) {
@@ -69,11 +69,13 @@ public class RedisDistributedLock implements DLock {
         this.threadId = threadId;
 
         // default renewal
-        this.renewExecutor = Executors.newSingleThreadScheduledExecutor();
+        if (lockConfig.isEnableRenewal()) {
+            this.renewExecutor = Executors.newSingleThreadScheduledExecutor();
+        }
     }
 
-    public void setLockConfig(DLockConfig dLockConfig) {
-        this.dLockConfig = dLockConfig;
+    public void setLockConfig(DLockConfig lockConfig) {
+        this.lockConfig = lockConfig;
     }
 
     @Override
@@ -106,7 +108,7 @@ public class RedisDistributedLock implements DLock {
                 }
 
                 // sleepy
-                Thread.sleep(dLockConfig.getTrySleepMillis());
+                Thread.sleep(lockConfig.getTrySleepMillis());
             }
         } catch (Exception e) {
             throw new DLockException("lock fail !", e);
@@ -161,6 +163,10 @@ public class RedisDistributedLock implements DLock {
      * Start the lock renewals task.
      */
     private void startRenewal(long leaseTime, TimeUnit unit) {
+        if (renewExecutor == null) {
+            log.debug("not open lock renewals service ! ");
+            return;
+        }
         renewExecutor.scheduleAtFixedRate(() -> {
             // no locks, no renewal required.
             if (!isLocked) {
@@ -175,20 +181,24 @@ public class RedisDistributedLock implements DLock {
                     redisTemplate.expire(lockKey, leaseTime, unit);
                 } else {
                     // lost lock, to stop renew
-                    stopRenewal();
+                    this.stopRenewal();
                     isLocked = false;
                 }
             } catch (Exception e) {
                 // renewal failed, print log.
                 log.error("lock renewals fail: {}", e.getMessage(), e);
             }
-        }, dLockConfig.getRenewalPeriod() / 3, dLockConfig.getRenewalPeriod() / 3, TimeUnit.MILLISECONDS);
+        }, lockConfig.getRenewalPeriod() / 3, lockConfig.getRenewalPeriod() / 3, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Stop the lock renewals task.
      */
     private void stopRenewal() {
+        if (renewExecutor == null) {
+            log.debug("not open lock renewals service, need not to stop ! ");
+            return;
+        }
         renewExecutor.shutdownNow();
     }
 

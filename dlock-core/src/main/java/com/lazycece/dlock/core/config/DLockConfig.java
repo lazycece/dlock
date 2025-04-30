@@ -28,6 +28,11 @@ public class DLockConfig {
     private long trySleepMillis = 100;
 
     /**
+     * Whether to enable the renewal capability.
+     */
+    private boolean enableRenewal = true;
+
+    /**
      * The renewal period, default 3 * 1000 milliseconds.
      */
     private long renewalPeriod = 3 * 1000;
@@ -39,6 +44,14 @@ public class DLockConfig {
 
     public void setTrySleepMillis(long trySleepMillis) {
         this.trySleepMillis = trySleepMillis;
+    }
+
+    public boolean isEnableRenewal() {
+        return enableRenewal;
+    }
+
+    public void setEnableRenewal(boolean enableRenewal) {
+        this.enableRenewal = enableRenewal;
     }
 
     public long getRenewalPeriod() {
