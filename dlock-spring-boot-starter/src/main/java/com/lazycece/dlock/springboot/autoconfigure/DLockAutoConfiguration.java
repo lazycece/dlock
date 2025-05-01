@@ -17,15 +17,17 @@
 package com.lazycece.dlock.springboot.autoconfigure;
 
 import com.alibaba.fastjson2.JSON;
-import com.lazycece.dlock.springboot.DLockFactory;
+import com.lazycece.dlock.core.DLockFactory;
+import com.lazycece.dlock.core.config.DLockConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * @author lazycece
@@ -34,15 +36,30 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({DLockProperties.class})
 @ComponentScan(basePackages = "com.lazycece.dlock")
-@ConditionalOnBean(DLockFactory.class)
 public class DLockAutoConfiguration implements InitializingBean {
 
     private final Logger log = LoggerFactory.getLogger(DLockAutoConfiguration.class);
     private final DLockProperties lockProperties;
+    private final StringRedisTemplate redisTemplate;
 
     @Autowired
-    public DLockAutoConfiguration(DLockProperties lockProperties) {
+    public DLockAutoConfiguration(DLockProperties lockProperties, StringRedisTemplate redisTemplate) {
         this.lockProperties = lockProperties;
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Bean
+    public DLockFactory dLockFactory() throws IllegalAccessException {
+
+        DLockConfig lockConfig = new DLockConfig();
+        lockConfig.setDefaultWaitMillisTime(lockProperties.getDefaultWaitMillisTime());
+        lockConfig.setTrySleepMillis(lockProperties.getTrySleepMillis());
+        lockConfig.setEnableRenewal(lockProperties.isEnableRenewal());
+        lockConfig.setRenewalThreshold(lockProperties.getRenewalThreshold());
+
+        DLockFactory factory = new DLockFactory(redisTemplate);
+        factory.setLockConfig(lockConfig);
+        return factory;
     }
 
 

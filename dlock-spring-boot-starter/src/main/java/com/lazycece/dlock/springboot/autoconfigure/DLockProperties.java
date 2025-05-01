@@ -18,8 +18,6 @@ package com.lazycece.dlock.springboot.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.UUID;
-
 /**
  * @author lazycece
  * @date 2025/4/27
@@ -46,16 +44,6 @@ public class DLockProperties {
      * The renewal threshold, default the lease time is greater than or equal to 3000 millisecond.
      */
     private long renewalThreshold = 3000;
-
-    /**
-     * Is this lock reentrant?
-     */
-    private boolean reentrancy = true;
-
-    /**
-     * The machine instance id, default is uuid; you should use the real instance id.
-     */
-    private String machineInstanceId = UUID.randomUUID().toString();
 
     public long getDefaultWaitMillisTime() {
         return defaultWaitMillisTime;
@@ -89,19 +77,4 @@ public class DLockProperties {
         this.renewalThreshold = renewalThreshold;
     }
 
-    public boolean isReentrancy() {
-        return reentrancy;
-    }
-
-    public void setReentrancy(boolean reentrancy) {
-        this.reentrancy = reentrancy;
-    }
-
-    public String getMachineInstanceId() {
-        return machineInstanceId;
-    }
-
-    public void setMachineInstanceId(String machineInstanceId) {
-        this.machineInstanceId = machineInstanceId;
-    }
 }
