@@ -19,10 +19,15 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.redisson</groupId>-->
+<!--            <artifactId>redisson-spring-boot-starter</artifactId>-->
+<!--            <version>3.36.0</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>3.36.0</version>
+            <groupId>com.lazycece.dlock</groupId>
+            <artifactId>dlock-spring-boot-starter</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 
