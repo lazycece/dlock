@@ -28,19 +28,19 @@ public interface DLock {
      * try lock using default wait time
      *
      * @param leaseTime     lease time.
-     * @param leaseTimeunit time unit
+     * @param leaseTimeUnit time unit
      */
-    boolean tryLock(long leaseTime, TimeUnit leaseTimeunit);
+    boolean tryLock(long leaseTime, TimeUnit leaseTimeUnit);
 
     /**
      * try lock
      *
      * @param waitMillisTime wait time while trying.
      * @param leaseTime      lease time
-     * @param leaseTimeunit  lease time unit
+     * @param leaseTimeUnit  lease time unit
      * @return lock result
      */
-    boolean tryLock(long waitMillisTime, long leaseTime, TimeUnit leaseTimeunit);
+    boolean tryLock(long waitMillisTime, long leaseTime, TimeUnit leaseTimeUnit);
 
     /**
      * Releases the lock.
