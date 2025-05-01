@@ -21,11 +21,9 @@ import com.lazycece.dlock.core.DLockFactory;
 import com.lazycece.dlock.core.config.DLockConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -35,8 +33,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 @Configuration
 @EnableConfigurationProperties({DLockProperties.class})
-@ComponentScan(basePackages = "com.lazycece.dlock")
-public class DLockAutoConfiguration implements InitializingBean {
+public class DLockAutoConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DLockAutoConfiguration.class);
     private final DLockProperties lockProperties;
@@ -49,7 +46,7 @@ public class DLockAutoConfiguration implements InitializingBean {
     }
 
     @Bean
-    public DLockFactory dLockFactory() throws IllegalAccessException {
+    public DLockFactory dLockFactory() {
 
         DLockConfig lockConfig = new DLockConfig();
         lockConfig.setDefaultWaitMillisTime(lockProperties.getDefaultWaitMillisTime());
@@ -59,12 +56,9 @@ public class DLockAutoConfiguration implements InitializingBean {
 
         DLockFactory factory = new DLockFactory(redisTemplate);
         factory.setLockConfig(lockConfig);
+
+        log.info("dlock loading completed, lock config is: {}", JSON.toJSONString(lockConfig));
+
         return factory;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        log.info("dlock loading completed, lock config is: {}", JSON.toJSONString(lockProperties));
     }
 }
