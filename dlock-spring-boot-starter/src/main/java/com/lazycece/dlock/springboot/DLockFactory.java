@@ -68,7 +68,7 @@ public class DLockFactory {
 
     private DLockConfig getLockConfig() {
         DLockConfig config = new DLockConfig();
-        config.setDefaultTimeoutWaitTime(lockProperties.getDefaultTimeoutWaitTime());
+        config.setDefaultWaitMillisTime(lockProperties.getDefaultWaitMillisTime());
         config.setTrySleepMillis(lockProperties.getTrySleepMillis());
         config.setEnableRenewal(lockProperties.isEnableRenewal());
         config.setRenewalPeriod(lockProperties.getRenewalPeriod());

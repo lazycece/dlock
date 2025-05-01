@@ -80,7 +80,7 @@ public class RedisDistributedLock implements DLock {
 
     @Override
     public boolean tryLock(long leaseTime, TimeUnit leaseTimeunit) {
-        return this.tryLock(lockConfig.getDefaultTimeoutWaitTime(), leaseTime, leaseTimeunit);
+        return this.tryLock(lockConfig.getDefaultWaitMillisTime(), leaseTime, leaseTimeunit);
     }
 
     @Override

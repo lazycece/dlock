@@ -49,7 +49,7 @@ public class SampleController {
         if (lock.tryLock(5, TimeUnit.MINUTES)) {
             try {
                 log.info("================== core sample handle something .");
-                Thread.sleep(10 * 1000);
+                Thread.sleep(30 * 1000);
             } finally {
                 try {
                     lock.unlock();
