@@ -165,9 +165,12 @@ public class RedisDistributedLock implements DLock {
             log.debug("not open lock renewals service ! ");
             return;
         }
+
+        log.debug("lock renewal service start, lockKey = {}", lockKey);
         renewExecutor.scheduleAtFixedRate(() -> {
             // no locks, no renewal required.
             if (!isLocked) {
+                log.debug("not owned lock, need not to  renewal, lockKey = {}", lockKey);
                 return;
             }
 
@@ -177,8 +180,10 @@ public class RedisDistributedLock implements DLock {
                 if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
                     // current own, to renew
                     redisTemplate.expire(lockKey, leaseTime, leaseTimeunit);
+                    log.debug("lock renewal successful, lockKey = {}", lockKey);
                 } else {
                     // lost lock, to stop renew
+                    log.debug("not owned lock, stop renewal service, lockKey = {}", lockKey);
                     this.stopRenewal();
                     isLocked = false;
                 }
