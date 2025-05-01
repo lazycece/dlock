@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lazycece.dlock.springboot.function;
+package com.lazycece.dlock.core.function;
 
 /**
  * @author lazycece

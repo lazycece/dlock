@@ -14,12 +14,11 @@
  *    limitations under the License.
  */
 
-package com.lazycece.dlock.springboot;
+package com.lazycece.dlock.core;
 
-import com.lazycece.dlock.core.DLock;
 import com.lazycece.dlock.core.exception.DLockTimeoutException;
-import com.lazycece.dlock.springboot.function.Answer;
-import com.lazycece.dlock.springboot.function.Handler;
+import com.lazycece.dlock.core.function.Answer;
+import com.lazycece.dlock.core.function.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
