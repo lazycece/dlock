@@ -38,9 +38,9 @@ public class DLockConfig {
     private boolean enableRenewal = true;
 
     /**
-     * The renewal period, default 3 * 1000 milliseconds.
+     * The renewal threshold, default the lease time is greater than or equal to 3000 millisecond.
      */
-    private long renewalPeriod = 3 * 1000;
+    private long renewalThreshold = 3000;
 
     public long getDefaultWaitMillisTime() {
         return defaultWaitMillisTime;
@@ -66,11 +66,11 @@ public class DLockConfig {
         this.enableRenewal = enableRenewal;
     }
 
-    public long getRenewalPeriod() {
-        return renewalPeriod;
+    public long getRenewalThreshold() {
+        return renewalThreshold;
     }
 
-    public void setRenewalPeriod(long renewalPeriod) {
-        this.renewalPeriod = renewalPeriod;
+    public void setRenewalThreshold(long renewalThreshold) {
+        this.renewalThreshold = renewalThreshold;
     }
 }

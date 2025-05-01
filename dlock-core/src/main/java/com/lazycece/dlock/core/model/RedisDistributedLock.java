@@ -59,7 +59,7 @@ public class RedisDistributedLock implements DLock {
     private final StringRedisTemplate redisTemplate;
     private final String lockKey;
     private final String token;
-    private ScheduledExecutorService renewExecutor;
+    private ScheduledExecutorService watchdog;
     /* init parameter end */
 
     public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String token) {
@@ -70,7 +70,7 @@ public class RedisDistributedLock implements DLock {
 
         // default renewal
         if (lockConfig.isEnableRenewal()) {
-            this.renewExecutor = Executors.newSingleThreadScheduledExecutor();
+            this.watchdog = Executors.newSingleThreadScheduledExecutor();
         }
     }
 
@@ -85,7 +85,7 @@ public class RedisDistributedLock implements DLock {
 
     @Override
     public boolean tryLock(long waitMillisTime, long leaseTime, TimeUnit leaseTimeUnit) {
-        long expireMillisTime = TimeoutUtils.toMillis(leaseTime, leaseTimeUnit);
+        long leaseMillisTime = TimeoutUtils.toMillis(leaseTime, leaseTimeUnit);
         long start = System.currentTimeMillis();
 
         try {
@@ -94,7 +94,7 @@ public class RedisDistributedLock implements DLock {
 
             while (true) {
                 Long result = redisTemplate.execute(lockScript, Collections.singletonList(lockKey)
-                        , lockedValueJson, String.valueOf(expireMillisTime));
+                        , lockedValueJson, String.valueOf(leaseMillisTime));
 
                 if (LuaScript.SUCCESS.equals(result)) {
                     isLocked = true;
@@ -161,13 +161,20 @@ public class RedisDistributedLock implements DLock {
      * Start the lock renewals task.
      */
     private void startRenewal(long leaseTime, TimeUnit leaseTimeUnit) {
-        if (renewExecutor == null) {
+        if (watchdog == null) {
             log.debug("not open lock renewals service ! ");
             return;
         }
 
+        long leaseMillisTime = TimeoutUtils.toMillis(leaseTime, leaseTimeUnit);
+        if (leaseMillisTime < lockConfig.getRenewalThreshold()) {
+            log.debug("lock lease time dose not reach the threshold, and the renewals service will not be enabled. ");
+            return;
+        }
+
         log.debug("lock renewal service start, lockKey = {}", lockKey);
-        renewExecutor.scheduleAtFixedRate(() -> {
+
+        watchdog.scheduleAtFixedRate(() -> {
             // no locks, no renewal required.
             if (!isLocked) {
                 log.debug("not owned lock, need not to  renewal, lockKey = {}", lockKey);
@@ -191,20 +198,18 @@ public class RedisDistributedLock implements DLock {
                 // renewal failed, print log.
                 log.error("lock renewals fail: {}", e.getMessage(), e);
             }
-            // TODO: 2025/5/1  是否考虑根据阙值时间来续约？？？这样能更好的控制线程运行频率
-            // TODO: 2025/5/1  0.5的阙值，并且过期时间小于xxx的一律不开启续约，避免线程平凡运行
-        }, lockConfig.getRenewalPeriod() / 3, lockConfig.getRenewalPeriod() / 3, TimeUnit.MILLISECONDS);
+        }, leaseMillisTime / 3, leaseMillisTime / 3, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Stop the lock renewals task.
      */
     private void stopRenewal() {
-        if (renewExecutor == null) {
+        if (watchdog == null) {
             log.debug("not open lock renewals service, need not to stop ! ");
             return;
         }
-        renewExecutor.shutdownNow();
+        watchdog.shutdownNow();
     }
 
 }

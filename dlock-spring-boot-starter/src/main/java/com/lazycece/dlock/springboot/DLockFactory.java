@@ -71,7 +71,7 @@ public class DLockFactory {
         config.setDefaultWaitMillisTime(lockProperties.getDefaultWaitMillisTime());
         config.setTrySleepMillis(lockProperties.getTrySleepMillis());
         config.setEnableRenewal(lockProperties.isEnableRenewal());
-        config.setRenewalPeriod(lockProperties.getRenewalPeriod());
+        config.setRenewalThreshold(lockProperties.getRenewalThreshold());
         return config;
     }
 }
