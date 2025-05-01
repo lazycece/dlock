@@ -58,15 +58,15 @@ public class RedisDistributedLock implements DLock {
     /* init parameter begin */
     private final StringRedisTemplate redisTemplate;
     private final String lockKey;
-    private final String threadId;
+    private final String token;
     private ScheduledExecutorService renewExecutor;
     /* init parameter end */
 
-    public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String threadId) {
+    public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String token) {
         // variable
         this.redisTemplate = redisTemplate;
         this.lockKey = lockKey;
-        this.threadId = threadId;
+        this.token = token;
 
         // default renewal
         if (lockConfig.isEnableRenewal()) {
@@ -89,7 +89,7 @@ public class RedisDistributedLock implements DLock {
         long start = System.currentTimeMillis();
 
         try {
-            LockedValue lockedValue = LockedValue.lockedValue(threadId, 1);
+            LockedValue lockedValue = LockedValue.lockedValue(token, 1);
             String lockedValueJson = JSON.toJSONString(lockedValue);
 
             while (true) {
@@ -121,7 +121,7 @@ public class RedisDistributedLock implements DLock {
         }
 
         try {
-            LockedValue lockedValue = LockedValue.lockedValue(threadId, 1);
+            LockedValue lockedValue = LockedValue.lockedValue(token, 1);
             String lockedValueJson = JSON.toJSONString(lockedValue);
 
             Long result = redisTemplate.execute(unLockScript, Collections.singletonList(lockKey), lockedValueJson);
@@ -177,7 +177,7 @@ public class RedisDistributedLock implements DLock {
             try {
                 String lockedValueJson = redisTemplate.opsForValue().get(lockKey);
                 LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
-                if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
+                if (lockedValue != null && token.equals(lockedValue.getToken())) {
                     // current own, to renew
                     redisTemplate.expire(lockKey, leaseTime, leaseTimeunit);
                     log.debug("lock renewal successful, lockKey = {}", lockKey);

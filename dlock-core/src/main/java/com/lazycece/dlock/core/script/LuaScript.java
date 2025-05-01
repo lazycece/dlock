@@ -27,17 +27,17 @@ public class LuaScript {
     // lock lua script
     public static final String LOCK_SCRIPT =
                     "local lockKey = KEYS[1]\n" +
-                    "local threadInfo = ARGV[1]\n" +
+                    "local lockValue = ARGV[1]\n" +
                     "local expireTime = tonumber(ARGV[2])\n" +
                     "local currentValue = redis.call('get', lockKey)\n" +
                     "if currentValue == false then\n" +
-                    "    local newValue = cjson.decode(threadInfo)\n" +
+                    "    local newValue = cjson.decode(lockValue)\n" +
                     "    newValue.expireTime = redis.call('time')[1] * 1000 + expireTime\n" +
                     "    redis.call('set', lockKey, cjson.encode(newValue), 'PX', expireTime)\n" +
                     "    return 1\n" +
                     "else\n" +
                     "    local map = cjson.decode(currentValue)\n" +
-                    "    if map.threadId == cjson.decode(threadInfo).threadId then\n" +
+                    "    if map.token == cjson.decode(lockValue).token then\n" +
                     "        map.count = map.count + 1\n" +
                     "        map.expireTime = redis.call('time')[1] * 1000 + expireTime\n" +
                     "        redis.call('set', lockKey, cjson.encode(map), 'PX', expireTime)\n" +
@@ -49,13 +49,13 @@ public class LuaScript {
     // unlock lua script
     public static final String UNLOCK_SCRIPT =
                     "local lockKey = KEYS[1]\n" +
-                    "local threadInfo = ARGV[1]\n" +
+                    "local lockValue = ARGV[1]\n" +
                     "local currentValue = redis.call('get', lockKey)\n" +
                     "if currentValue == false then\n" +
                     "    return 1\n" +
                     "else\n" +
                     "    local map = cjson.decode(currentValue)\n" +
-                    "    if map.threadId == cjson.decode(threadInfo).threadId then\n" +
+                    "    if map.token == cjson.decode(lockValue).token then\n" +
                     "        if map.count > 1 then\n" +
                     "            map.count = map.count - 1\n" +
                     "            redis.call('set', lockKey, cjson.encode(map), 'PX', map.expireTime - redis.call('time')[1] * 1000)\n" +

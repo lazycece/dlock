@@ -22,22 +22,22 @@ package com.lazycece.dlock.core.model;
  */
 public class LockedValue {
 
-    private String threadId;
+    private String token;
     private Integer count;
 
-    public static LockedValue lockedValue(String threadId, Integer count) {
+    public static LockedValue lockedValue(String token, Integer count) {
         LockedValue value = new LockedValue();
-        value.setThreadId(threadId);
+        value.setToken(token);
         value.setCount(count);
         return value;
     }
 
-    public String getThreadId() {
-        return threadId;
+    public String getToken() {
+        return token;
     }
 
-    public void setThreadId(String threadId) {
-        this.threadId = threadId;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Integer getCount() {
