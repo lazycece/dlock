@@ -79,14 +79,13 @@ public class RedisDistributedLock implements DLock {
     }
 
     @Override
-    public boolean tryLock(long leaseTime, TimeUnit unit) {
-        return this.tryLock(lockConfig.getDefaultTimeoutWaitTime(), leaseTime, unit);
+    public boolean tryLock(long leaseTime, TimeUnit leaseTimeunit) {
+        return this.tryLock(lockConfig.getDefaultTimeoutWaitTime(), leaseTime, leaseTimeunit);
     }
 
     @Override
-    public boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) {
-        long waitMillisTime = TimeoutUtils.toMillis(waitTime, unit);
-        long expireMillisTime = TimeoutUtils.toMillis(leaseTime, unit);
+    public boolean tryLock(long waitMillisTime, long leaseTime, TimeUnit leaseTimeunit) {
+        long expireMillisTime = TimeoutUtils.toMillis(leaseTime, leaseTimeunit);
         long start = System.currentTimeMillis();
 
         try {
@@ -95,11 +94,11 @@ public class RedisDistributedLock implements DLock {
 
             while (true) {
                 Long result = redisTemplate.execute(lockScript, Collections.singletonList(lockKey)
-                        , Collections.singletonList(lockedValueJson), String.valueOf(expireMillisTime));
+                        , lockedValueJson, String.valueOf(expireMillisTime));
 
                 if (LuaScript.SUCCESS.equals(result)) {
                     isLocked = true;
-                    this.startRenewal(leaseTime, unit);
+                    this.startRenewal(leaseTime, leaseTimeunit);
                     return true;
                 }
 
@@ -125,8 +124,7 @@ public class RedisDistributedLock implements DLock {
             LockedValue lockedValue = LockedValue.lockedValue(threadId, 1);
             String lockedValueJson = JSON.toJSONString(lockedValue);
 
-            Long result = redisTemplate.execute(unLockScript, Collections.singletonList(lockKey)
-                    , Collections.singletonList(lockedValueJson));
+            Long result = redisTemplate.execute(unLockScript, Collections.singletonList(lockKey), lockedValueJson);
 
             if (LuaScript.SUCCESS.equals(result)) {
                 this.stopRenewal();
@@ -162,7 +160,7 @@ public class RedisDistributedLock implements DLock {
     /**
      * Start the lock renewals task.
      */
-    private void startRenewal(long leaseTime, TimeUnit unit) {
+    private void startRenewal(long leaseTime, TimeUnit leaseTimeunit) {
         if (renewExecutor == null) {
             log.debug("not open lock renewals service ! ");
             return;
@@ -178,7 +176,7 @@ public class RedisDistributedLock implements DLock {
                 LockedValue lockedValue = JSON.parseObject(lockedValueJson, LockedValue.class);
                 if (lockedValue != null && threadId.equals(lockedValue.getThreadId())) {
                     // current own, to renew
-                    redisTemplate.expire(lockKey, leaseTime, unit);
+                    redisTemplate.expire(lockKey, leaseTime, leaseTimeunit);
                 } else {
                     // lost lock, to stop renew
                     this.stopRenewal();

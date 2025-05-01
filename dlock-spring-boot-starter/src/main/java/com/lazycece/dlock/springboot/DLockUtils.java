@@ -33,9 +33,9 @@ public class DLockUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DLockUtils.class);
 
-    public static void tryLock(String lockKey, long leaseTime, TimeUnit unit, Handler handler) {
+    public static void tryLock(String lockKey, long leaseTime, TimeUnit leaseTimeunit, Handler handler) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
-        if (lock.tryLock(leaseTime, unit)) {
+        if (lock.tryLock(leaseTime, leaseTimeunit)) {
             try {
                 handler.handle();
             } finally {
@@ -50,9 +50,9 @@ public class DLockUtils {
         }
     }
 
-    public static void tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Handler handler) {
+    public static void tryLock(String lockKey, long waitMillisTime, long leaseTime, TimeUnit leaseTimeunit, Handler handler) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
-        if (lock.tryLock(waitTime, leaseTime, unit)) {
+        if (lock.tryLock(waitMillisTime, leaseTime, leaseTimeunit)) {
             try {
                 handler.handle();
             } finally {
@@ -67,9 +67,9 @@ public class DLockUtils {
         }
     }
 
-    public static <T> T tryLock(String lockKey, long leaseTime, TimeUnit unit, Answer<T> answer) {
+    public static <T> T tryLock(String lockKey, long leaseTime, TimeUnit leaseTimeunit, Answer<T> answer) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
-        if (lock.tryLock(leaseTime, unit)) {
+        if (lock.tryLock(leaseTime, leaseTimeunit)) {
             try {
                 return answer.reply();
             } finally {
@@ -84,9 +84,9 @@ public class DLockUtils {
         }
     }
 
-    public static <T> T tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Answer<T> answer) {
+    public static <T> T tryLock(String lockKey, long waitMillisTime, long leaseTime, TimeUnit leaseTimeunit, Answer<T> answer) {
         DLock lock = DLockFactory.getInstance().produce(lockKey);
-        if (lock.tryLock(waitTime, leaseTime, unit)) {
+        if (lock.tryLock(waitMillisTime, leaseTime, leaseTimeunit)) {
             try {
                 return answer.reply();
             } finally {

@@ -25,22 +25,22 @@ import java.util.concurrent.TimeUnit;
 public interface DLock {
 
     /**
-     * lock
+     * try lock using default wait time
      *
-     * @param leaseTime lease time.
-     * @param unit      time unit
+     * @param leaseTime     lease time.
+     * @param leaseTimeunit time unit
      */
-    boolean tryLock(long leaseTime, TimeUnit unit);
+    boolean tryLock(long leaseTime, TimeUnit leaseTimeunit);
 
     /**
      * try lock
      *
-     * @param waitTime  wait time while trying.
-     * @param leaseTime lease time
-     * @param unit      time unit
+     * @param waitMillisTime wait time while trying.
+     * @param leaseTime      lease time
+     * @param leaseTimeunit  lease time unit
      * @return lock result
      */
-    boolean tryLock(long waitTime, long leaseTime, TimeUnit unit);
+    boolean tryLock(long waitMillisTime, long leaseTime, TimeUnit leaseTimeunit);
 
     /**
      * Releases the lock.

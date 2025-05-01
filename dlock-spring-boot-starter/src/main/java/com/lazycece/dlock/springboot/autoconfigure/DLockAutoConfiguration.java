@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties({DLockProperties.class})
-@ComponentScan(basePackages = "com.lazycece.dlock.*")
+@ComponentScan(basePackages = "com.lazycece.dlock")
 @ConditionalOnBean(DLockFactory.class)
 public class DLockAutoConfiguration implements InitializingBean {
 
