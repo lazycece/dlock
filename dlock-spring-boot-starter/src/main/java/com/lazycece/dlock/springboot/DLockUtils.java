@@ -41,8 +41,8 @@ public class DLockUtils {
             } finally {
                 try {
                     lock.unlock();
-                } catch (Exception ine) {
-                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                } catch (Exception e) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey, e);
                 }
             }
         } else {
@@ -58,8 +58,8 @@ public class DLockUtils {
             } finally {
                 try {
                     lock.unlock();
-                } catch (Exception ine) {
-                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                } catch (Exception e) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey, e);
                 }
             }
         } else {
@@ -75,8 +75,8 @@ public class DLockUtils {
             } finally {
                 try {
                     lock.unlock();
-                } catch (Exception ine) {
-                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                } catch (Exception e) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey, e);
                 }
             }
         } else {
@@ -92,8 +92,8 @@ public class DLockUtils {
             } finally {
                 try {
                     lock.unlock();
-                } catch (Exception ine) {
-                    LOGGER.error("unlock error, lockKey = {}", lockKey);
+                } catch (Exception e) {
+                    LOGGER.error("unlock error, lockKey = {}", lockKey, e);
                 }
             }
         } else {
