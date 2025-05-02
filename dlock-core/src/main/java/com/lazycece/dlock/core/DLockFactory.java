@@ -29,8 +29,9 @@ import java.util.UUID;
 public class DLockFactory {
 
     private static DLockFactory instance;
-    private DLockConfig lockConfig = new DLockConfig();
     private final StringRedisTemplate redisTemplate;
+
+    private DLockConfig lockConfig = new DLockConfig();
 
     public DLockFactory(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;

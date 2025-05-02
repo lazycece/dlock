@@ -52,26 +52,19 @@ public class RedisDistributedLock implements DLock {
      * @see RedisDistributedLock#setLockConfig
      */
     private DLockConfig lockConfig = new DLockConfig();
-
+    private final ScheduledExecutorService watchdog = Executors.newSingleThreadScheduledExecutor();
     private volatile boolean isLocked = false;
 
     /* init parameter begin */
     private final StringRedisTemplate redisTemplate;
     private final String lockKey;
     private final String token;
-    private ScheduledExecutorService watchdog;
     /* init parameter end */
 
     public RedisDistributedLock(StringRedisTemplate redisTemplate, String lockKey, String token) {
-        // variable
         this.redisTemplate = redisTemplate;
         this.lockKey = lockKey;
         this.token = token;
-
-        // default renewal
-        if (lockConfig.isEnableRenewal()) {
-            this.watchdog = Executors.newSingleThreadScheduledExecutor();
-        }
     }
 
     public void setLockConfig(DLockConfig lockConfig) {
@@ -161,8 +154,8 @@ public class RedisDistributedLock implements DLock {
      * Start the lock renewals task.
      */
     private void startRenewal(long leaseTime, TimeUnit leaseTimeUnit) {
-        if (watchdog == null) {
-            log.debug("not open lock renewals service ! ");
+        if (!lockConfig.isEnableRenewal()) {
+            log.debug("lock renewal service is not enabled ! ");
             return;
         }
 
@@ -205,10 +198,6 @@ public class RedisDistributedLock implements DLock {
      * Stop the lock renewals task.
      */
     private void stopRenewal() {
-        if (watchdog == null) {
-            log.debug("not open lock renewals service, need not to stop ! ");
-            return;
-        }
         watchdog.shutdownNow();
     }
 
