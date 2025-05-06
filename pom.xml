@@ -22,7 +22,7 @@
     <packaging>pom</packaging>
     <version>${revision}</version>
     <name>dlock-parent</name>
-    <description>DLock</description>
+    <description>dlock parent</description>
     <url>https://github.com/lazycece/dlock</url>
 
     <scm>

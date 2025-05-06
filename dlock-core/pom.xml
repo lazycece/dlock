@@ -24,6 +24,7 @@
     </parent>
     <artifactId>dlock-core</artifactId>
     <name>${project.artifactId}</name>
+    <description>dlock core</description>
 
     <dependencies>
         <dependency>
