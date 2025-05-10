@@ -67,6 +67,10 @@ public class RedisDistributedLock implements DLock {
         this.token = token;
     }
 
+    public String getToken() {
+        return token;
+    }
+
     public void setLockConfig(DLockConfig lockConfig) {
         this.lockConfig = lockConfig;
     }

@@ -26,6 +26,7 @@
     </parent>
     <artifactId>dlock-spring-boot-starter</artifactId>
     <name>${project.artifactId}</name>
+    <description>dlock spring boot starter</description>
 
     <dependencies>
         <dependency>

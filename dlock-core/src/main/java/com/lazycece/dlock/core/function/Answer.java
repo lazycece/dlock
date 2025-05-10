@@ -20,6 +20,7 @@ package com.lazycece.dlock.core.function;
  * @author lazycece
  * @date 2025/5/1
  */
+@FunctionalInterface
 public interface Answer<R> {
 
     R reply();

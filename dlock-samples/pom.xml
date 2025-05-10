@@ -9,6 +9,8 @@
     </parent>
     <artifactId>dlock-samples</artifactId>
     <name>${project.artifactId}</name>
+    <description>dlock samples</description>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

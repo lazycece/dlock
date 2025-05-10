@@ -78,28 +78,24 @@ public class SampleController {
     @GetMapping("/reentrant")
     public String reentrant() throws InterruptedException {
         log.info("================== reentrant begin");
+        this.reentrantLock(3);
+        log.info("================== reentrant end");
+        return "reentrant end";
+    }
 
+    private void reentrantLock(int index) {
+        if (index <= 0) {
+            return;
+        }
         DLock lock = DLockFactory.getInstance().produce("reentrant");
-        if (lock.tryLock(60, TimeUnit.SECONDS)) {
+        if (lock.tryLock(300, TimeUnit.SECONDS)) {
             try {
-                if (lock.tryLock(60, TimeUnit.SECONDS)) {
-                    try {
-                        Thread.sleep(20 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            lock.unlock();
-                        } catch (Exception e) {
-                            log.error("unlock error, lockKey = {}", "reentrant", e);
-                        }
-                    }
-                } else {
-                    throw new DLockTimeoutException("try lock timeout!");
-                }
+                log.info("================== reentrant {}", index);
+                this.reentrantLock(index - 1);
             } finally {
                 try {
                     lock.unlock();
+                    log.info("================== reentrant {} exist", index);
                 } catch (Exception e) {
                     log.error("unlock error, lockKey = {}", "reentrant", e);
                 }
@@ -107,9 +103,6 @@ public class SampleController {
         } else {
             throw new DLockTimeoutException("try lock timeout!");
         }
-
-        log.info("================== reentrant end");
-        return "reentrant end";
     }
 
 

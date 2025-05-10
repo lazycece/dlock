@@ -19,6 +19,7 @@ package com.lazycece.dlock.core;
 import com.lazycece.dlock.core.config.DLockConfig;
 import com.lazycece.dlock.core.model.RedisDistributedLock;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ public class DLockFactory {
 
     private static DLockFactory instance;
     private final StringRedisTemplate redisTemplate;
+    private final ThreadLocal<String> dlockToken = new ThreadLocal<>();
 
     private DLockConfig lockConfig = new DLockConfig();
 
@@ -43,7 +45,13 @@ public class DLockFactory {
     }
 
     public DLock produce(String lockKey) {
-        String token = UUID.randomUUID().toString();
+        // thread reentrant
+        String token = dlockToken.get();
+        if (!StringUtils.hasText(token)) {
+            token = UUID.randomUUID().toString();
+            dlockToken.set(token);
+        }
+
         RedisDistributedLock lock = new RedisDistributedLock(redisTemplate, lockKey, token);
         lock.setLockConfig(lockConfig);
         return lock;
