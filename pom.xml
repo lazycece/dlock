@@ -53,7 +53,7 @@
 
     <properties>
         <!-- Project revision -->
-        <revision>1.0.0</revision>
+        <revision>1.0.1-SNAPSHOT</revision>
 
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
